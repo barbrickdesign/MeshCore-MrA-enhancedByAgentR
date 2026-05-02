@@ -73,6 +73,7 @@ public:
   void formatStatsReply(char *reply) override;
   void formatRadioStatsReply(char *reply) override;
   void formatPacketStatsReply(char *reply) override;
+  void formatExtPowerStatsReply(char *reply) override;
   mesh::LocalIdentity& getSelfId() override { return self_id; }
   void saveIdentity(const mesh::LocalIdentity& new_id) override;
   void clearStats() override { }

@@ -755,6 +755,12 @@ void MyMesh::formatPacketStatsReply(char *reply) {
                                        getNumRecvFlood(), getNumRecvDirect());
 }
 
+void MyMesh::formatExtPowerStatsReply(char *reply) {
+  if (!sensors.formatExtPowerStats(reply)) {
+    strcpy(reply, "No external power monitoring board detected");
+  }
+}
+
 void MyMesh::handleCommand(uint32_t sender_timestamp, char *command, char *reply) {
   while (*command == ' ')
     command++; // skip leading spaces
