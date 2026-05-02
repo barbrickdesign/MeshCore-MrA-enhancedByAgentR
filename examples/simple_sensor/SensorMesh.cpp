@@ -832,6 +832,12 @@ void SensorMesh::formatPacketStatsReply(char *reply) {
                                        getNumRecvFlood(), getNumRecvDirect());
 }
 
+void SensorMesh::formatExtPowerStatsReply(char *reply) {
+  if (!sensors.formatExtPowerStats(reply)) {
+    strcpy(reply, "No external power monitoring board detected");
+  }
+}
+
 float SensorMesh::getTelemValue(uint8_t channel, uint8_t type) {
   auto buf = telemetry.getBuffer();
   uint8_t size = telemetry.getSize();

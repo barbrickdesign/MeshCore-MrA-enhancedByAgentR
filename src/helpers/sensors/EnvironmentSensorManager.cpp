@@ -490,28 +490,64 @@ bool EnvironmentSensorManager::querySensors(uint8_t requester_permissions, Cayen
 
 
 bool EnvironmentSensorManager::formatExtPowerStats(char* reply) {
-#if ENV_INCLUDE_INA3221
-  if (!INA3221_initialized) return false;
   char* dp = reply;
-  *dp++ = '{';
-  bool first = true;
-  for (int i = 0; i < TELEM_INA3221_NUM_CHANNELS; i++) {
-    if (INA3221.isChannelEnabled(i)) {
-      int ch = i + 1;
-      int voltage_mv = (int)(INA3221.getBusVoltage(i) * 1000);
-      int current_ma = (int)(INA3221.getCurrentAmps(i) * 1000);
-      if (!first) *dp++ = ',';
-      sprintf(dp, "\"ch%d_voltage_mv\":%d,\"ch%d_current_ma\":%d", ch, voltage_mv, ch, current_ma);
-      dp = strchr(dp, 0);
-      first = false;
+  bool any = false;
+
+#if ENV_INCLUDE_INA3221
+  if (INA3221_initialized) {
+    for (int i = 0; i < TELEM_INA3221_NUM_CHANNELS; i++) {
+      if (INA3221.isChannelEnabled(i)) {
+        int ch = i + 1;
+        int voltage_mv = (int)(INA3221.getBusVoltage(i) * 1000);
+        int current_ma = (int)(INA3221.getCurrentAmps(i) * 1000);
+        if (!any) *dp++ = '{';
+        else *dp++ = ',';
+        sprintf(dp, "\"ch%d_voltage_mv\":%d,\"ch%d_current_ma\":%d", ch, voltage_mv, ch, current_ma);
+        dp = strchr(dp, 0);
+        any = true;
+      }
     }
   }
-  *dp++ = '}';
-  *dp = 0;
-  return true;
-#else
-  return false;
 #endif
+
+#if ENV_INCLUDE_INA219
+  if (INA219_initialized) {
+    int voltage_mv = (int)(INA219.getBusVoltage_V() * 1000);
+    int current_ma = (int)(INA219.getCurrent_mA());
+    *dp++ = any ? ',' : '{';
+    sprintf(dp, "\"ina219_voltage_mv\":%d,\"ina219_current_ma\":%d", voltage_mv, current_ma);
+    dp = strchr(dp, 0);
+    any = true;
+  }
+#endif
+
+#if ENV_INCLUDE_INA260
+  if (INA260_initialized) {
+    int voltage_mv = (int)(INA260.readBusVoltage());
+    int current_ma = (int)(INA260.readCurrent());
+    *dp++ = any ? ',' : '{';
+    sprintf(dp, "\"ina260_voltage_mv\":%d,\"ina260_current_ma\":%d", voltage_mv, current_ma);
+    dp = strchr(dp, 0);
+    any = true;
+  }
+#endif
+
+#if ENV_INCLUDE_INA226
+  if (INA226_initialized) {
+    int voltage_mv = (int)(INA226.getBusVoltage() * 1000);
+    int current_ma = (int)(INA226.getCurrent_mA());
+    *dp++ = any ? ',' : '{';
+    sprintf(dp, "\"ina226_voltage_mv\":%d,\"ina226_current_ma\":%d", voltage_mv, current_ma);
+    dp = strchr(dp, 0);
+    any = true;
+  }
+#endif
+
+  if (any) {
+    *dp++ = '}';
+    *dp = 0;
+  }
+  return any;
 }
 
 int EnvironmentSensorManager::getNumSettings() const {

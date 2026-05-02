@@ -134,7 +134,11 @@ This document provides an overview of CLI commands that can be sent to MeshCore 
 
 **Serial Only:** Yes
 
-**Note:** Returns JSON with only enabled channels, e.g. `{"ch1_voltage_mv":12450,"ch1_current_ma":150,"ch2_voltage_mv":3800,"ch2_current_ma":85}`
+**Note:** Returns JSON with detected sensor readings. Supported hardware:
+  - INA3221 (3-channel): fields `ch1_voltage_mv`, `ch1_current_ma`, ... `ch3_voltage_mv`, `ch3_current_ma` (only enabled channels included)
+  - INA219 (single-channel): fields `ina219_voltage_mv`, `ina219_current_ma`
+  - INA260 (single-channel): fields `ina260_voltage_mv`, `ina260_current_ma`
+  - INA226 (single-channel): fields `ina226_voltage_mv`, `ina226_current_ma`
 
 **Note:** Returns "No external power monitoring board detected" if no supported hardware is present
 
@@ -801,7 +805,7 @@ region save
 
 ---
 
-#### View or change thevalue of a sensor
+#### View or change the value of a sensor
 **Usage:** 
 - `sensor get <key>`
 - `sensor set <key> <value>`
